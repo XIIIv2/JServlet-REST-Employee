@@ -86,9 +86,8 @@ public class EmployeeController extends HttpServlet {
             } else {
                 employeeDtoCreateResponse = EmployeeDtoCreateResponse.of(false, null);
             }
-
-            String json = objectMapper.writeValueAsString(employeeDtoCreateResponse);
             try (ServletOutputStream out = resp.getOutputStream()) {
+                String json = objectMapper.writeValueAsString(employeeDtoCreateResponse);
                 resp.setContentType(CONTENT_TYPE);
                 resp.setCharacterEncoding(CHARACTER_ENCODING);
                 resp.setContentLength(json.length());
