@@ -1,13 +1,14 @@
 package icu.xiii.app.dto.employee;
 
+import icu.xiii.app.dto.BaseDtoResponse;
 import icu.xiii.app.entity.Employee;
 import jakarta.servlet.http.HttpServletResponse;
 
-public record EmployeeDtoCreateResponse (
+public record EmployeeDtoCreateResponse(
         int statusCode,
         boolean success,
         String message,
-        Employee employee) {
+        Employee employee) implements BaseDtoResponse {
 
     public static final String SUCCESS_MESSAGE = "Employee has been created successfully.";
     public static final String FAILURE_MESSAGE = "Employee has not been created!";

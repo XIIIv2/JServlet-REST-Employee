@@ -1,12 +1,12 @@
 package icu.xiii.app.dto.employee;
 
-import icu.xiii.app.entity.Employee;
+import icu.xiii.app.dto.BaseDtoResponse;
 import jakarta.servlet.http.HttpServletResponse;
 
 public record EmployeeDtoDeleteResponse(
         int statusCode,
         boolean success,
-        String message) {
+        String message) implements BaseDtoResponse {
 
     public static final String SUCCESS_MESSAGE = "Employee with id %s has been deleted successfully.";
     public static final String FAILURE_MESSAGE = "Employee with id %s has not been found!";

@@ -1,5 +1,6 @@
 package icu.xiii.app.dto.employee;
 
+import icu.xiii.app.dto.BaseDtoResponse;
 import icu.xiii.app.entity.Employee;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -10,7 +11,7 @@ public record EmployeeDtoGetListResponse(
         int statusCode,
         boolean success,
         String message,
-        List<Employee> employeeList) {
+        List<Employee> employeeList) implements BaseDtoResponse {
 
     public static final String SUCCESS_MESSAGE = "Employee list has been fetched successfully.";
     public static final String FAILURE_MESSAGE = "Employee list has not been found!";

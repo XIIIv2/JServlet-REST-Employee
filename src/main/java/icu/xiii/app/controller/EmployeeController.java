@@ -1,6 +1,7 @@
 package icu.xiii.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import icu.xiii.app.dto.BaseDtoResponse;
 import icu.xiii.app.dto.employee.*;
 import icu.xiii.app.entity.Employee;
 import icu.xiii.app.service.employee.EmployeeService;
@@ -39,24 +40,20 @@ public class EmployeeController extends HttpServlet {
         String uri = req.getRequestURI();
         String[] uriParts = uri.split("/");
         String pathValue = uriParts[uriParts.length - 1];
-        String json = "";
 
         if (pathValue != null && !pathValue.isBlank() && !pathValue.equals("employees")) {
             Long employeeId = Long.parseLong(pathValue);
             Employee employee = this.service.getById(employeeId);
             EmployeeDtoGetByIdResponse dto =EmployeeDtoGetByIdResponse.of(employeeId, employee != null, employee);
-            resp.setStatus(dto.statusCode());
-            json = objectMapper.writeValueAsString(dto);
+            sendResponse(resp, dto);
         } else if (pathValue != null && pathValue.equals("employees")) {
             List<Employee> employeeList = this.service.getAll();
             EmployeeDtoGetListResponse dto = EmployeeDtoGetListResponse.of(
                     employeeList.isEmpty(),
                     employeeList.isEmpty() ? Collections.emptyList() : employeeList
             );
-            resp.setStatus(dto.statusCode());
-            json = objectMapper.writeValueAsString(dto);
+            sendResponse(resp, dto);
         }
-        sendResponse(resp, json);
     }
 
     @Override
@@ -66,7 +63,6 @@ public class EmployeeController extends HttpServlet {
             EmployeeDtoRequest employeeDtoRequest = objectMapper.readValue(in, EmployeeDtoRequest.class);
             Employee employee = service.create(employeeDtoRequest);
             EmployeeDtoCreateResponse employeeDtoCreateResponse = EmployeeDtoCreateResponse.of(employee != null, employee);
-            resp.setStatus(employeeDtoCreateResponse.statusCode());
             sendResponse(resp, employeeDtoCreateResponse);
         }
     }
@@ -91,7 +87,6 @@ public class EmployeeController extends HttpServlet {
                 } else {
                     employeeDtoUpdateResponse = EmployeeDtoUpdateResponse.of(employeeId, false, null);
                 }
-                resp.setStatus(employeeDtoUpdateResponse.statusCode());
                 sendResponse(resp, employeeDtoUpdateResponse);
             }
         }
@@ -107,22 +102,22 @@ public class EmployeeController extends HttpServlet {
             Long employeeId = Long.parseLong(pathValue);
             boolean isEmployeeDeleted = service.deleteById(employeeId);
             EmployeeDtoDeleteResponse employeeDtoDeleteResponse = EmployeeDtoDeleteResponse.of(employeeId, isEmployeeDeleted);
-            resp.setStatus(employeeDtoDeleteResponse.statusCode());
             sendResponse(resp, employeeDtoDeleteResponse);
         }
     }
 
-    private void sendResponse(HttpServletResponse resp, Object dto) throws ServletException, IOException {
-        sendResponse(resp, objectMapper.writeValueAsString(dto));
-    }
-
-    private void sendResponse(HttpServletResponse resp, String json) throws ServletException, IOException {
+    private void sendResponse(HttpServletResponse resp, String json, int statusCode) throws ServletException, IOException {
         resp.setContentType(CONTENT_TYPE);
         resp.setCharacterEncoding(CHARACTER_ENCODING);
         resp.setContentLength(json.length());
+        resp.setStatus(statusCode);
         try (ServletOutputStream out = resp.getOutputStream()) {
             out.println(json);
             out.flush();
         }
+    }
+
+    private void sendResponse(HttpServletResponse resp, BaseDtoResponse dto) throws ServletException, IOException {
+        sendResponse(resp, objectMapper.writeValueAsString(dto), dto.statusCode());
     }
 }
